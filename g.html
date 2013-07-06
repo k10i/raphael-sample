@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+    <script src="js/raphael-min.js"></script>
+    <script>
+    $(function() {
+      var paper = Raphael(document.getElementById('svgStage'), 300, 300);
+      var circle = paper.circle(0, 70, 50);
+      circle.attr('fill', '#0000aa');
+//      circle.animate({'cx':200}, 1000);
+
+      var rect = paper.rect(100, 100, 50, 50)
+      .attr({
+      'fill': '#ffcccc',
+      'stroke': '#aa0000'
+});
+
+      var line = paper.path("M10,200 L200,0");
+      var line_dot = paper.path("M10,300 L200,0");
+      line_dot.attr({"stroke-dasharray": "--"});
+      $( "#slider" ).slider({
+        slide: function( event, ui ) {
+//          console.log(ui.value);
+          circle.remove();
+          circle = paper.circle(ui.value, 70, 50);
+          circle.attr('fill', '#0000aa');
+
+//          circle.animate({'cx': 50 + ui.value});
+          line.remove();
+          line = paper.path("M10,200 L200," + ui.value);
+
+          line_dot.remove();
+          line_dot = paper.path("M10,300 L200," + ui.value);
+          line_dot.attr({"stroke-dasharray": "--"});
+/*
+          line.animate({transform: "L100," + ui.value}, 0, "none", function() {
+            var transform = this.attr('transform');
+            Raphael.transformPath(this.attr('path'), transform);
+          });
+*/
+        }
+      });
+    });
+    </script>
+  </head>
+  <body>
+    <div id="svgStage"></div>
+    <div id="slider" style="width:200px"></div>
+  </body>
+</html>
