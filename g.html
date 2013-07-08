@@ -9,6 +9,15 @@
 
     <script src="js/raphael-min.js"></script>
     <script>
+    (function () {
+      if (typeof window.console === "undefined") {
+        window.console = {}
+      }
+      if (typeof window.console.log !== "function") {
+        window.console.log = function () {}
+      }
+    })();
+      
     $(function() {
       var paper = Raphael(document.getElementById('svgStage'), 300, 300);
       var circle = paper.circle(0, 70, 50);
@@ -24,6 +33,62 @@
       var line = paper.path("M10,200 L200,0");
       var line_dot = paper.path("M10,300 L200,0");
       line_dot.attr({"stroke-dasharray": "--"});
+
+
+      var image = Raphael(document.getElementById('imgStage'), 300, 300);
+      var img = image.image("img/lena_std.png", 0, 0, 300, 300);
+      var imgBase = image.rect(0, 0, 300, 300).attr({'fill':'#ffffff', 'opacity':0});
+      img.transform("s0.8,0.8");
+
+      var sx, sy, ex, ey;
+      var imgStageOffset = $("#imgStage").position();
+      var dragRect;
+
+    function imageOnMove(dx, dy, x, y, event) {
+    ex = x - imgStageOffset.left;
+    ey = y - imgStageOffset.top;
+
+    if (dragRect) {
+    dragRect.remove();
+    }
+        var _sx, _sy, _ex, _ey;
+        if (sx < ex) {
+          _sx = sx;
+          _ex = ex;
+        } else {
+          _sx = ex;
+          _ex = sx;
+        }
+        if (sy < ey) {
+          _sy = sy;
+          _ey = ey;
+        } else {
+          _sy = ey;
+          _ey = sy;
+        }
+
+        dragRect = image.rect(_sx, _sy, _ex - _sx, _ey - _sy).attr({'fill':'#ffffff', 'opacity':0.4, 'stroke-width':0.5,'stroke-opacity':1});
+
+
+      }
+
+      function imageOnStart(x, y, event) {
+        sx = x - imgStageOffset.left;
+        sy = y - imgStageOffset.top;
+        ex = x - imgStageOffset.left;
+        ey = y - imgStageOffset.top;
+//        console.log([x, y, event]);
+        if (dragRect) {
+          dragRect.remove();
+        }
+      }
+
+      function imageOnEnd() {
+        imgBase.toFront();
+      }
+
+      imgBase.drag(imageOnMove, imageOnStart, imageOnEnd, img, img, img);
+
       $( "#slider" ).slider({
         slide: function( event, ui ) {
 //          console.log(ui.value);
@@ -31,13 +96,15 @@
           circle = paper.circle(ui.value, 70, 50);
           circle.attr('fill', '#0000aa');
 
-//          circle.animate({'cx': 50 + ui.value});
           line.remove();
           line = paper.path("M10,200 L200," + ui.value);
 
           line_dot.remove();
           line_dot = paper.path("M10,300 L200," + ui.value);
           line_dot.attr({"stroke-dasharray": "--"});
+          var size = (ui.value + 0.1) / 100 + 0.8;
+          img.transform("s" + size + "," + size);
+
 /*
           line.animate({transform: "L100," + ui.value}, 0, "none", function() {
             var transform = this.attr('transform');
@@ -50,7 +117,9 @@
     </script>
   </head>
   <body>
+    <div id="imgStage" style="width:300px; height:300px; border:1px solid #000;">
     <div id="svgStage"></div>
     <div id="slider" style="width:200px"></div>
+    </div>
   </body>
 </html>
