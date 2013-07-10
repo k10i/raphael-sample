@@ -13,6 +13,7 @@
 
       var radius = 30;
       var Z_MAX = 1000;
+      var vp = {x: screenX, y: screenY}; //消失点(vanishing point)
 
       var paper = Raphael(document.getElementById('svgStage'), stage.width, stage.height);
       var stage = paper.rect(0, 0, stage.width, stage.height).attr({
@@ -20,19 +21,29 @@
       });
         
       function drawCircle(aX, aY, aZ) {
-        var scale = 1.0 - aZ / Z_MAX;
+        var scale = aZ / Z_MAX;
 
         var _x = aX + screenX;
         var _y = aY + screenY;
+
+        _x = _x + (vp.x - _x) * scale;
+        _y = _y + (vp.y - _y) * scale;
         
-        var _radius = radius * scale;
+        var _radius = radius * (1 - scale);
         console.log([_x, _y, aZ, scale, _radius]);
-        var circle = paper.circle(_x, _y, _radius).attr({'fill':'blue'});
+        var circle = paper.circle(_x, _y, _radius).attr({
+          'fill':'blue', 
+          'stroke':'white'
+        });
       }
 
       drawCircle(0, 0, 0);
 
       drawCircle(100, 0, 500);
+      drawCircle(100, 0, 400);
+      drawCircle(100, 0, 300);
+      drawCircle(100, 0, 200);
+      drawCircle(100, 0, 100);
     });
 
 
