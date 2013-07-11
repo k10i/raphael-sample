@@ -23,6 +23,7 @@
         paper.rect(0, 0, stage.width, stage.height).attr({
           'stroke': 'black'
         });
+        paper.text(85, stage.height - 20, "camera.z: " + camera.z).attr({'font-size': '20px'});
       }
 
       stageInit();
@@ -57,7 +58,16 @@
         drawCircle(100, 0, 100);
       }
 
-      setInterval(render, 100);
+      setInterval(render, 50);
+
+      $("#zoomOut").click(function() {
+        camera.z += 100;
+      });
+
+      $("#zoomIn").click(function() {
+        camera.z -= 100;
+      });
+      
     });
 
 
@@ -65,5 +75,9 @@
   </head>
   <body>
     <div id="svgStage"></div>
+    <div>
+      <input id="zoomOut" type="button" value="Z+"">
+      <input id="zoomIn" type="button" value="Z-"">
+    </div>
   </body>
 </html>
