@@ -87,31 +87,37 @@
           });
         }
       }
-//      render();
-      setInterval(render, 100);
+      render();
+//      setInterval(render, 100);
 
       $("#zoomOut").click(function() {
         camera.z += 100;
+        render();
       });
 
       $("#zoomIn").click(function() {
         camera.z -= 100;
+        render();
       });
 
       $("#moveLeft").click(function() {
         camera.x -= 10;
+        render();
       });
 
       $("#moveRight").click(function() {
         camera.x += 10;
+        render();
       });
 
       $("#moveTop").click(function() {
         camera.y += 10;
+        render();
       });
 
       $("#moveBottom").click(function() {
         camera.y -= 10;
+        render();
       });
     });
 
