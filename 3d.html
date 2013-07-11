@@ -24,7 +24,11 @@
         paper.rect(0, 0, stage.width, stage.height).attr({
           'stroke': 'black'
         });
-        paper.text(85, stage.height - 20, "camera.z: " + camera.z).attr({'font-size': '20px'});
+        paper.text(10, stage.height - 35, 
+                   "camera.x: " + camera.x +
+                   "\ncamera.y: " + camera.y +
+                   "\ncamera.z: " + camera.z
+                   ).attr({'font-size': '16px', 'text-anchor': 'start'})
       }
 
       function itemsInit() {
@@ -39,10 +43,11 @@
         var _x = aX + screenX;
         var _y = aY + screenY;
 
-        _x = _x + (vp.x - _x) * scale;
-        _y = _y + (vp.y - _y) * scale;
+        _x = _x + (vp.x - _x) * scale - camera.x * scale;
+        _y = _y + (vp.y - _y) * scale - camera.y * scale;
         
         var _radius = radius * (1 - scale);
+
 //        console.log([_x, _y, aZ, scale, _radius]);
 
         items.push({
@@ -63,7 +68,7 @@
         paper.clear();
         stageInit();
         itemsInit();
-
+        
         drawCircle(0, 0, 0);
 
         drawCircle(100, 0, 500);
@@ -92,7 +97,22 @@
       $("#zoomIn").click(function() {
         camera.z -= 100;
       });
-      
+
+      $("#moveLeft").click(function() {
+        camera.x -= 10;
+      });
+
+      $("#moveRight").click(function() {
+        camera.x += 10;
+      });
+
+      $("#moveTop").click(function() {
+        camera.y += 10;
+      });
+
+      $("#moveBottom").click(function() {
+        camera.y -= 10;
+      });
     });
 
 
@@ -101,8 +121,13 @@
   <body>
     <div id="svgStage"></div>
     <div>
-      <input id="zoomOut" type="button" value="Z+"">
-      <input id="zoomIn" type="button" value="Z-"">
+      カメラの位置<br />
+      <input id="zoomOut" type="button" value="Z+">
+      <input id="zoomIn" type="button" value="Z-"><br />
+      <input id="moveRight" type="button" value="X+">
+      <input id="moveLeft" type="button" value="X-"><br />
+      <input id="moveTop" type="button" value="Y+">
+      <input id="moveBottom" type="button" value="Y-"><br />
     </div>
   </body>
 </html>
