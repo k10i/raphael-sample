@@ -57,6 +57,7 @@
         console.log([_x, _y, aZ, scale, _radius]);
 
         items.push({
+          type: "circle",
           x: _x,
           y: _y,
           z: aZ,
@@ -70,6 +71,41 @@
 */
       }
 
+      function drawLine(params) {
+        var sx = params.sx || 0;
+        var ex = params.ex || 0;
+        var sy = params.sy || 0;
+        var ey = params.ey || 0;
+        var sz = params.sz || 0;
+        var ez = params.ez || 0;
+        var strokeWidth = params.width || 1;
+
+        if (camera.z > sz) {
+          return;
+        }
+
+        var scale = (sz - camera.z) / Z_MAX;
+        var scale2 = (ez - camera.z) / Z_MAX;
+        if (scale > 1.0) scale = 1.0;
+        if (scale2 > 1.0) scale2 = 1.0;
+
+        var _sx = sx + screenX;
+        var _ex = ex + screenX;
+        var _sy = sy + screenY;
+        var _ey = ey + screenY;
+
+        _sx = _sx + (vp.x - _sx) * scale - camera.x * scale;
+        _ex = _ex + (vp.x - _ex) * scale2 - camera.x * scale2;
+        _sy = _sy + (vp.y - _sy) * scale - camera.y * scale;
+        _ey = _ey + (vp.y - _ey) * scale2 - camera.y * scale2;
+
+
+        var start = "M" + _sx + "," + _sy;
+        var end = "L" + _ex + "," + _ey;
+
+        items.push({type: "path", attr: {line:start + " " + end, strokeWidth: strokeWidth}});
+      }
+
       function render() {
         console.log([camera.x, camera.y, camera.z]);
         paper.clear();
@@ -77,21 +113,31 @@
         itemsInit();
         
         drawCircle(0, 0, 0);
-/*
+//        drawLine({sx:0, ex:100});
+        drawLine({sx:-100, ex:-100, sy:0, ey:0, sz:0, ez:500, width:5});
+
         drawCircle(100, 0, 500);
         drawCircle(100, 0, 400);
         drawCircle(100, 0, 300);
         drawCircle(100, 0, 200);
         drawCircle(100, 0, 100);
-*/
+
         items = items.sort(function(a, b){ return b.z - a.z }); // zの降順でソート
 
         for (var i = 0; i < items.length; i++) {
           var item = items[i];
-          paper.circle(item.x, item.y, item.radius).attr({
-            'fill':'blue', 
-            'stroke':'white'
-          });
+          switch (item.type) {
+            case "circle":
+              paper.circle(item.x, item.y, item.radius).attr({
+                'fill':'blue', 
+                'stroke':'white'
+              });
+              break;
+            case "path":
+              console.log(item.attr.line);
+              paper.path(item.attr.line).attr({"stroke-width":item.attr.strokeWidth});
+              break;
+          }
         }
       }
       render();
