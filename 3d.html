@@ -38,7 +38,13 @@
       stageInit();
       itemsInit();
       function drawCircle(aX, aY, aZ) {
+
+        if (camera.z > aZ) {
+          return;
+        }
+
         var scale = (aZ - camera.z) / Z_MAX;
+        if (scale > 1.0) scale = 1.0;
 
         var _x = aX + screenX;
         var _y = aY + screenY;
@@ -48,7 +54,7 @@
         
         var _radius = radius * (1 - scale);
 
-//        console.log([_x, _y, aZ, scale, _radius]);
+        console.log([_x, _y, aZ, scale, _radius]);
 
         items.push({
           x: _x,
@@ -65,18 +71,19 @@
       }
 
       function render() {
+        console.log([camera.x, camera.y, camera.z]);
         paper.clear();
         stageInit();
         itemsInit();
         
         drawCircle(0, 0, 0);
-
+/*
         drawCircle(100, 0, 500);
         drawCircle(100, 0, 400);
         drawCircle(100, 0, 300);
         drawCircle(100, 0, 200);
         drawCircle(100, 0, 100);
-
+*/
         items = items.sort(function(a, b){ return b.z - a.z }); // zの降順でソート
 
         for (var i = 0; i < items.length; i++) {
