@@ -14,6 +14,10 @@
 
       var radius = 30;
       var Z_MAX = 1000;
+      var xNum = 1; //格子のX軸の線の数
+      var yNum = 1; //格子のY軸の線の数
+      var zNum = 10; //更新のZ軸の線の数
+      
       var vp = {x: screenX, y: screenY}; //消失点(vanishing point)
 
       var camera = {x: 0, y: 0, z: -500}; //カメラ
@@ -54,14 +58,15 @@
         
         var _radius = radius * (1 - scale);
 
-        console.log([_x, _y, aZ, scale, _radius]);
+//        console.log([_x, _y, aZ, scale, _radius]);
 
         items.push({
           type: "circle",
           x: _x,
           y: _y,
           z: aZ,
-          radius: _radius
+          radius: _radius,
+          opacity: 1 - scale
         });
 /*
         var circle = paper.circle(_x, _y, _radius).attr({
@@ -79,11 +84,11 @@
         var sz = params.sz || 0;
         var ez = params.ez || 0;
         var strokeWidth = params.width || 1;
-
+/*
         if (camera.z > sz) {
           return;
         }
-
+*/
         var scale = (sz - camera.z) / Z_MAX;
         var scale2 = (ez - camera.z) / Z_MAX;
         if (scale > 1.0) scale = 1.0;
@@ -103,18 +108,18 @@
         var start = "M" + _sx + "," + _sy;
         var end = "L" + _ex + "," + _ey;
 
-        items.push({type: "path", attr: {line:start + " " + end, strokeWidth: strokeWidth}});
+        items.push({type: "path", attr: {line:start + " " + end, strokeWidth: strokeWidth, strokeOpacity: 1 - scale}});
       }
 
       function render() {
-        console.log([camera.x, camera.y, camera.z]);
+//        console.log([camera.x, camera.y, camera.z]);
         paper.clear();
         stageInit();
         itemsInit();
-        
+        makeGuide();
         drawCircle(0, 0, 0);
 //        drawLine({sx:0, ex:100});
-        drawLine({sx:-100, ex:-100, sy:0, ey:0, sz:0, ez:500, width:5});
+//        drawLine({sx:-100, ex:-100, sy:0, ey:0, sz:0, ez:500, width:5});
 
         drawCircle(100, 0, 500);
         drawCircle(100, 0, 400);
@@ -130,12 +135,13 @@
             case "circle":
               paper.circle(item.x, item.y, item.radius).attr({
                 'fill':'blue', 
-                'stroke':'white'
+                'stroke':'white',
+//                'opacity': item.opacity
               });
               break;
             case "path":
-              console.log(item.attr.line);
-              paper.path(item.attr.line).attr({"stroke-width":item.attr.strokeWidth});
+//              console.log(item.attr.line);
+              paper.path(item.attr.line).attr({"stroke-width":item.attr.strokeWidth, "stroke-opacity": 1, "stroke":'#ccc'});
               break;
           }
         }
@@ -172,6 +178,61 @@
         camera.y -= 10;
         render();
       });
+
+      function makeXLine() {
+        var top = -stage.height / 2;
+        var bottom = stage.height / 2;
+        var left = -stage.width / 2;
+        var right = stage.width / 2;
+        var num = xNum;
+        var space = (num == 0)? 0 : stage.width / (num * 2);
+        var zSpace = Z_MAX  / zNum;
+        
+        for (var i = -zNum; i <= zNum; i++) { // Z軸
+          for (var j = -num; j <= num; j++) { // Y軸
+            drawLine({sx:left, ex:right, sy: j * space, ey: j * space, sz: i * zSpace, ez: i * zSpace, width:1});
+          }
+        }
+      }
+
+      function makeYLine() {
+        var top = -stage.height / 2;
+        var bottom = stage.height / 2;
+        var left = -stage.width / 2;
+        var right = stage.width / 2;
+        var num = yNum;
+        var space = (num == 0)? 0 : stage.height / (num * 2);
+        var zSpace = Z_MAX / zNum;
+
+        for (var i = -zNum; i <= zNum; i++) { // Z軸
+          for (var j = -num; j <= num; j++) { // X軸
+            drawLine({sx: j * space, ex: j * space, sy: top, ey: bottom, sz: i * zSpace, ez: i * zSpace, width:1});
+          }
+        }
+      }
+
+      function makeZLine() {
+        var top = -stage.height / 2;
+        var bottom = stage.height / 2;
+        var left = -stage.width / 2;
+        var right = stage.width / 2;
+
+        var _xNum = 10;
+        var xSpace = (_xNum == 0)? 0 : stage.height / (_xNum * 2);
+        var ySpace = stage.width / (yNum * 2);
+
+        for (var i = -yNum; i <= yNum; i++) { // Y軸
+          for (var j = -_xNum; j <= _xNum; j++) { // X軸
+            drawLine({sx: j * xSpace, ex: j * xSpace, sy: i * ySpace, ey: i * ySpace, sz: -Z_MAX, ez: Z_MAX, width:1});
+          }
+        }
+      }
+
+      function makeGuide() {
+        makeXLine();
+        makeYLine();
+        makeZLine();
+      }
     });
 
 
@@ -180,7 +241,7 @@
   <body>
     <div id="svgStage"></div>
     <div>
-      カメラの位置<br />
+      カメラの向き<br />
       <input id="zoomOut" type="button" value="Z+">
       <input id="zoomIn" type="button" value="Z-"><br />
       <input id="moveRight" type="button" value="X+">
